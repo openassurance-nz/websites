@@ -3,16 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpenAssurance — portable workplace assurance information</title>
-<meta name="description" content="An open standards initiative to make New Zealand workplace assurance information portable, independently verifiable, and exchangeable without requiring every organisation to use the same software platform.">
-<link rel="canonical" href="https://openassurance.nz/">
-<meta property="og:title" content="OpenAssurance">
-<meta property="og:description" content="Compete on assurance management. Cooperate on assurance exchange.">
+<title>OpenCompetency — portable worker competency evidence</title>
+<meta name="description" content="The OpenAssurance profile for people: qualifications, licences, training, practical competency, employer attestations and authorisations that can move between organisations without both using the same competency platform.">
+<link rel="canonical" href="https://opencompetency.nz/">
+<meta property="og:title" content="OpenCompetency">
+<meta property="og:description" content="Competency evidence that does not have to be re-entered in every customer's system.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://openassurance.nz/">
+<meta property="og:url" content="https://opencompetency.nz/">
 <meta property="og:locale" content="en_NZ">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f766e'/%3E%3Cpath d='M8 16h16M17 10l7 6-7 6' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231d4ed8'/%3E%3Cpath d='M8 16h16M17 10l7 6-7 6' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
+  /* Each site sets --accent / --accent-soft / --accent-ink for its own identity.
+     Everything else is shared, so the three sites read as one family. */
   :root {
     color-scheme: light;
     --bg: #fbfaf8;
@@ -293,6 +295,13 @@
   .domains a { display: block; margin-bottom: .35rem; text-decoration: none; }
   .domains a:hover { text-decoration: underline; color: var(--accent-ink); }
   .fineprint { margin-top: 2rem; padding-top: 1.4rem; border-top: 1px solid var(--rule); font-size: .82rem; line-height: 1.6; }
+
+  /* --- OpenCompetency identity ------------------------------------------ */
+  :root { --accent: #1d4ed8; --accent-soft: #e6edfd; --accent-ink: #1b47b4; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --accent: #93b4fd; --accent-soft: #1a2440; --accent-ink: #bfd0fe; }
+  }
+  :root[data-theme="dark"] { --accent: #93b4fd; --accent-soft: #1a2440; --accent-ink: #bfd0fe; }
 </style>
 </head>
 <body>
@@ -306,14 +315,14 @@
         <rect width="32" height="32" rx="6" fill="currentColor" opacity=".1"/>
         <path d="M8 16h16M17 10l7 6-7 6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      OpenAssurance
+      OpenCompetency
     </a>
     <nav class="top-nav" aria-label="Sections">
       <a href="#problem">Problem</a>
-      <a href="#proposal">Proposal</a>
-      <a href="#profiles">Profiles</a>
-      <a href="#principles">Principles</a>
-      <a href="#status">Status</a>
+      <a href="#covers">What it covers</a>
+      <a href="#provenance">Provenance</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#privacy">Privacy</a>
     </nav>
   </div>
 </header>
@@ -322,268 +331,206 @@
 
   <div class="hero" id="top">
     <div class="wrap">
-      <p class="eyebrow">New Zealand open standards initiative</p>
-      <h1>Assurance information that can move between organisations.</h1>
+      <p class="eyebrow">An OpenAssurance profile — people</p>
+      <h1>Competency evidence that doesn't have to be entered twice.</h1>
       <p class="standfirst">
-        Workplace assurance information should be portable, independently verifiable, and
-        exchangeable without requiring every organisation to use the same software platform.
+        Qualifications, licences, training, practical competency, experience, inductions and
+        employer authorisations — held by the employer, presented to whoever needs them, verified
+        without joining anyone's platform.
       </p>
-      <p class="motto">Compete on assurance management.<br>Cooperate on assurance exchange.</p>
+      <p class="motto">Define locally. Issue anywhere.<br>Share anywhere. Verify anywhere.</p>
       <div class="cta">
-        <a class="btn btn-primary" href="#discussion-paper">Read the discussion paper</a>
-        <a class="btn" href="https://github.com/openassurance-nz/openassurance">View on GitHub</a>
+        <a class="btn btn-primary" href="https://github.com/openassurance-nz/openassurance/blob/main/profiles/competency/README.md">Read the profile</a>
+        <a class="btn" href="https://openassurance.nz">About OpenAssurance</a>
       </div>
     </div>
   </div>
 
   <section id="problem">
     <div class="wrap">
-      <h2>The same information, entered again and again</h2>
+      <h2>The worker already exists somewhere else</h2>
       <p class="lede">
-        New Zealand organisations rely on digital systems to manage worker qualifications,
-        competency, training, licences, inductions, contractor prequalification, insurance,
-        and supporting evidence.
+        A contractor may already hold verified information about a worker — formal qualifications,
+        licences, practical assessments, experience, inductions, internal authorisations.
       </p>
       <p>
-        These systems provide real value. The difficulty is that the <em>exchange</em> of assurance
-        information is often coupled to the platform used to manage it.
+        A customer then requires that worker to be established inside another competency-management
+        platform. So the contractor creates a second worker record, enters the same identifying
+        information, uploads the same qualifications, reproduces the same competency records, and
+        from then on maintains expiry dates in both systems.
       </p>
       <p>
-        A contractor may already hold verified competency information for its workers, and still
-        be required to recreate those workers and their records inside a customer's nominated
-        system. A supplier may maintain substantially the same organisational information across
-        several prequalification schemes, procurement systems, customer portals, and tenders.
+        The additional administration does not create additional evidence of competency. It creates
+        another copy of the same evidence, and another thing that can fall out of date.
       </p>
-
-      <div class="stat">
-        <b>76</b>
-        <span>
-          prequalifications completed in a single year by one submitter, cited by the Minister
-          for Workplace Relations and Safety in August 2026.
-          <small>WorkSafe has since released a position statement and a common prequalification template to support a more consistent, risk-based approach.</small>
-        </span>
-      </div>
-
-      <p>
-        A common questionnaire helps organisations ask more consistent questions. The next
-        question is whether valid, current, independently verifiable information should have to
-        be supplied again at all.
-      </p>
+      <blockquote class="test">
+        <p>Can an employer provide valid competency evidence to a customer without both organisations being customers of the same competency platform?</p>
+        <cite>The OpenCompetency test</cite>
+      </blockquote>
     </div>
   </section>
 
-  <section id="proposal" class="tinted">
+  <section id="covers" class="tinted">
     <div class="wrap">
-      <h2>An open exchange layer, not another platform</h2>
+      <h2>What OpenCompetency covers</h2>
       <p>
-        OpenAssurance is not a proposal for a national database, a compulsory worker passport,
-        or another assurance product. It is a proposal to define how assurance records can be
-        issued, held, shared, received, and independently verified — so that existing and future
-        systems can exchange them directly.
+        Competency is not represented by formal qualifications alone. The profile is intended to
+        carry the full range of assurance information organisations actually rely on.
+      </p>
+      <ul class="nots">
+        <li>Qualifications</li>
+        <li>Licences</li>
+        <li>Training</li>
+        <li>Courses</li>
+        <li>Assessments</li>
+        <li>Practical competency</li>
+        <li>Experience</li>
+        <li>Inductions</li>
+        <li>Employer authorisations</li>
+        <li>Supervisor attestations</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="provenance">
+    <div class="wrap">
+      <h2>The original issuer stays visible</h2>
+      <p>
+        Different records come from different sources, and a record shared by an employer is still
+        the qualification provider's record. Sharing a credential does not make you its issuer.
       </p>
 
       <figure class="flow">
-        <svg viewBox="0 0 520 132" width="520" height="132" role="img"
-             aria-label="Organisation A sends a conforming assurance record through OpenAssurance to Organisation B. Each organisation uses software of its own choosing.">
+        <svg viewBox="0 0 520 168" width="520" height="168" role="img"
+             aria-label="Three separate issuers: a qualification provider issues a formal qualification, an employer issues practical competency, and a supervisor issues an experience attestation. Each remains attributable to its own issuer.">
           <defs>
-            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
               <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
             </marker>
           </defs>
-          <g fill="none" stroke="currentColor" stroke-width="1.25" opacity=".75">
-            <rect x="8" y="34" width="150" height="52" rx="7"/>
-            <rect x="362" y="34" width="150" height="52" rx="7"/>
-          </g>
-          <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">
-            <text x="83" y="56" font-weight="600">Organisation A</text>
-            <text x="83" y="74" font-size="11" opacity=".65">its own software</text>
-            <text x="437" y="56" font-weight="600">Organisation B</text>
-            <text x="437" y="74" font-size="11" opacity=".65">different software</text>
-            <text x="260" y="46" font-size="11" font-weight="600" letter-spacing=".06em">OPENASSURANCE</text>
-            <text x="260" y="96" font-size="11" opacity=".65">conforming assurance record</text>
-          </g>
-          <g stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)" opacity=".9">
-            <line x1="166" y1="64" x2="354" y2="64"/>
+          <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="currentColor" text-anchor="middle">
+            <g fill="none" stroke="currentColor" stroke-width="1.25" opacity=".7">
+              <rect x="6" y="12" width="160" height="40" rx="6"/>
+              <rect x="180" y="12" width="160" height="40" rx="6"/>
+              <rect x="354" y="12" width="160" height="40" rx="6"/>
+            </g>
+            <text x="86" y="37" font-weight="600">Qualification provider</text>
+            <text x="260" y="37" font-weight="600">Employer</text>
+            <text x="434" y="37" font-weight="600">Supervisor</text>
+            <g stroke="currentColor" stroke-width="1.4" marker-end="url(#ah2)" opacity=".85" fill="none">
+              <line x1="86" y1="56" x2="86" y2="84"/>
+              <line x1="260" y1="56" x2="260" y2="84"/>
+              <line x1="434" y1="56" x2="434" y2="84"/>
+            </g>
+            <g fill="none" stroke="currentColor" stroke-width="1.25" opacity=".45">
+              <rect x="6" y="92" width="160" height="40" rx="6"/>
+              <rect x="180" y="92" width="160" height="40" rx="6"/>
+              <rect x="354" y="92" width="160" height="40" rx="6"/>
+            </g>
+            <text x="86" y="117">Formal qualification</text>
+            <text x="260" y="117">Practical competency</text>
+            <text x="434" y="117">Experience attestation</text>
+            <text x="260" y="156" font-size="11" opacity=".65">each record remains attributable to the party that made it</text>
           </g>
         </svg>
-        <figcaption>Neither organisation needs to be a customer of the other's software provider.</figcaption>
+        <figcaption>The receiving organisation can identify who asserted what, and decide accordingly.</figcaption>
       </figure>
 
+      <h3>Workplace attestations matter</h3>
       <p>
-        Open data schemas alone do not achieve this. A schema can be public while the operational
-        pathway for sending or receiving the information still requires platform membership,
-        enterprise licensing, tenant setup, or duplicate records. So the test is deliberately
-        stricter:
+        An employer, supervisor, assessor or business owner may legitimately attest that a worker has
+        performed a task, accumulated experience, demonstrated practical ability, operated particular
+        equipment, worked under supervision, or satisfied an internal authorisation process.
       </p>
-
-      <blockquote class="test">
-        <p>Can Organisation A send a valid assurance record to Organisation B when neither organisation is a customer of the other's software provider?</p>
-        <cite>The core interoperability test</cite>
-      </blockquote>
-
       <p>
-        The receiving organisation always decides what it requires and accepts. OpenAssurance
-        makes information portable, attributable, and verifiable — it does not decide who is
-        competent or which contractor is acceptable.
+        OpenCompetency should represent these clearly — who made the assertion, their organisation,
+        what was asserted, the basis for it, when it applied, and any supporting evidence. The
+        receiving organisation remains free to decide whether that is sufficient.
       </p>
     </div>
   </section>
 
-  <section id="profiles">
+  <section id="requirements" class="tinted">
     <div class="wrap">
-      <h2>Two initial profiles</h2>
+      <h2>Requirements are set locally, not centrally</h2>
       <p>
-        OpenAssurance is the umbrella initiative. Its first two profiles apply the same exchange
-        model to people and to organisations.
+        An organisation defines what it requires for a role. OpenCompetency provides a common way to
+        express that requirement and test evidence against it — not a universal answer to who is
+        competent.
       </p>
-      <div class="duo">
-        <div class="card">
-          <span class="tag">People</span>
-          <h3>OpenCompetency</h3>
-          <p>
-            Qualifications, licences, training, practical competency, assessments, experience,
-            inductions, employer attestations, and authorisations — with the original issuer of
-            each record remaining identifiable.
-          </p>
-          <a href="https://opencompetency.nz">opencompetency.nz</a>
-        </div>
-        <div class="card">
-          <span class="tag">Organisations</span>
-          <h3>OpenPrequal</h3>
-          <p>
-            Prequalification assessments, insurance, health and safety systems, risk management,
-            incident and plant management, declarations, and supporting evidence — with evidence
-            kept separate from any one assessor's conclusion.
-          </p>
-          <a href="https://openprequal.nz">openprequal.nz</a>
-        </div>
+
+      <figure class="flow">
+        <svg viewBox="0 0 480 176" width="480" height="176" role="img"
+             aria-label="An example role requirement: Registered Electrical Worker requires a current practising licence, a recognised qualification, a current employer authorisation, and site induction where required.">
+          <g fill="none" stroke="currentColor" stroke-width="1.25" opacity=".7">
+            <rect x="6" y="10" width="468" height="156" rx="7"/>
+            <line x1="6" y1="52" x2="474" y2="52" opacity=".5"/>
+          </g>
+          <g font-family="ui-sans-serif, system-ui, sans-serif" fill="currentColor">
+            <text x="26" y="30" font-size="10.5" opacity=".6" letter-spacing=".08em">ROLE</text>
+            <text x="26" y="45" font-size="14" font-weight="600">Registered Electrical Worker</text>
+            <text x="26" y="74" font-size="10.5" opacity=".6" letter-spacing=".08em">REQUIRES</text>
+            <g font-size="12.5">
+              <text x="26" y="95">— current practising licence</text>
+              <text x="26" y="115">— recognised qualification</text>
+              <text x="26" y="135">— current employer authorisation</text>
+              <text x="26" y="155">— site induction where required</text>
+            </g>
+          </g>
+        </svg>
+        <figcaption>Illustrative only. This is not an assertion of what any organisation should require.</figcaption>
+      </figure>
+
+      <p>
+        The conclusion a receiving organisation reaches is therefore local and specific, rather than
+        a universal status attached to a person:
+      </p>
+      <blockquote class="test">
+        <p>“Meets Organisation X requirements” — not “Competent”.</p>
+        <cite>The organisation accepting the worker keeps that decision</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <h2>A worker's whole history is rarely the question</h2>
+      <p>
+        Competency records about a person are personal information. A customer needing evidence that
+        a worker satisfies one role should not receive that worker's complete qualification,
+        training, employment and medical history in order to get it.
+      </p>
+      <p>
+        OpenCompetency is built around purpose-specific presentation: private by default, disclosing
+        only what the stated purpose requires, with the intended recipient and purpose identifiable.
+        It should not create a universal worker number, and existing government, licence or
+        qualification identifiers should not quietly become one.
+      </p>
+      <p>
+        Consent is not assumed to be the only lawful basis for sharing. Employers and other
+        organisations may have other lawful bases; each participating organisation remains
+        responsible for identifying and documenting its own.
+      </p>
+      <div class="cta" style="margin-top:1.6rem">
+        <a class="btn" href="https://github.com/openassurance-nz/openassurance/blob/main/PRIVACY-PRINCIPLES.md">Privacy principles</a>
       </div>
     </div>
   </section>
 
-  <section id="privacy" class="tinted">
-    <div class="wrap">
-      <h2>Fewer copies, not more</h2>
-      <p>
-        Assurance records about people are personal information. Every duplicate record is another
-        place requiring access control, security, correction, retention, and breach management.
-      </p>
-      <p>
-        OpenAssurance is designed around purpose-specific presentation rather than wholesale
-        sharing. A customer needing evidence that a worker satisfies one role should not receive
-        that worker's complete competency and employment history. Personal information should be
-        private by default, and the standard should avoid creating a universal worker identifier
-        that enables tracking across unrelated organisations.
-      </p>
-      <blockquote class="test">
-        <p>Are we reducing the amount of personal information organisations need to duplicate and disclose, or are we creating another place to copy it?</p>
-        <cite>The core privacy test</cite>
-      </blockquote>
-      <p>
-        A formal Privacy Impact Assessment will form part of developing any stable specification.
-      </p>
-    </div>
-  </section>
-
-  <section id="principles">
-    <div class="wrap">
-      <h2>Founding principles</h2>
-      <p>Offered for discussion, and set out in full in the project charter.</p>
-      <ol class="principles">
-        <li><b>No mandatory platform.</b> <span>Exchange must not require a shared subscription.</span></li>
-        <li><b>No mandatory central registry.</b> <span>Not another central database.</span></li>
-        <li><b>Portable records.</b> <span>Changing provider must not invalidate a record.</span></li>
-        <li><b>Independent verification.</b> <span>Verifiable without platform membership.</span></li>
-        <li><b>Local acceptance.</b> <span>The receiving organisation decides.</span></li>
-        <li><b>Issuer provenance.</b> <span>Sharing a record does not make you its issuer.</span></li>
-        <li><b>Open exchange.</b> <span>No bilateral proprietary integrations required.</span></li>
-        <li><b>Privacy by design.</b> <span>Purpose-bound and limited to what is necessary.</span></li>
-        <li><b>No universal worker identifier.</b> <span>No tracking across unrelated organisations.</span></li>
-        <li><b>Small organisations can participate.</b> <span>No specialist IT infrastructure needed.</span></li>
-        <li><b>Reuse existing standards first.</b> <span>Prefer established open standards.</span></li>
-        <li><b>Vendor neutrality.</b> <span>Providers compete on services around the exchange layer.</span></li>
-      </ol>
-    </div>
-  </section>
-
-  <section id="not" class="tinted">
-    <div class="wrap">
-      <h2>What OpenAssurance is not</h2>
-      <p>
-        Existing competency, prequalification, assessment, and contractor-management products
-        should be able to support OpenAssurance without abandoning their commercial models. They
-        continue to compete on assessment, workflow, reporting, automation, and user experience.
-        What changes is that the underlying record can move.
-      </p>
-      <ul class="nots">
-        <li>Not a national worker database</li>
-        <li>Not a compulsory competency passport</li>
-        <li>Not a prequalification provider</li>
-        <li>Not an assessment company</li>
-        <li>Not a training provider</li>
-        <li>Not an accreditation authority</li>
-        <li>Not a central issuer registry</li>
-        <li>Not a replacement for existing assessment schemes</li>
-        <li>Not a replacement for commercial assurance software</li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="status">
+  <section id="status" class="tinted">
     <div class="wrap">
       <h2>Where this is up to</h2>
       <p class="lede">
-        OpenAssurance is an early-stage proposal, not a completed standard. No exchange protocol,
+        OpenCompetency is an early-stage proposal, not a completed standard. No exchange protocol,
         schema, or conformance suite exists yet.
       </p>
-      <ol class="phases">
-        <li class="now">
-          <b>Validate the problem <span class="now-tag">Current</span></b>
-          <span>Test the problem and assumptions with contractors, buyers, asset owners, regulators, industry organisations, assessment providers, and technology providers.</span>
-        </li>
-        <li>
-          <b>Map existing standards</b>
-          <span>Identify what already exists and should be adopted rather than recreated.</span>
-        </li>
-        <li>
-          <b>Define the minimum exchange model</b>
-          <span>A small v0.1 specification covering only what interoperability requires.</span>
-        </li>
-        <li>
-          <b>Demonstrate two reference exchanges</b>
-          <span>One competency example, one prequalification example.</span>
-        </li>
-        <li>
-          <b>Develop conformance tests</b>
-          <span>Define what a system must support before claiming compatibility.</span>
-        </li>
-        <li>
-          <b>Establish longer-term governance</b>
-          <span>Determine an independent stewardship model based on industry participation.</span>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <section id="discussion-paper" class="tinted">
-    <div class="wrap">
-      <h2>Questions we would like answered</h2>
       <p>
-        The discussion paper sets out the problem, the proposed model, and the open questions in
-        full. Disagreement is genuinely useful at this stage — including reasons the approach
-        will not work.
+        The current stage is testing the problem and assumptions with employers, workers, buyers,
+        qualification organisations, assessment providers, and technology providers. Disagreement is
+        useful — including reasons the approach will not work.
       </p>
-      <ul class="questions">
-        <li>How much assurance information is actually duplicated across New Zealand organisations, and where does it cost the most?</li>
-        <li>Are competency and prequalification the right first use cases?</li>
-        <li>What is the minimum information that needs to move between systems?</li>
-        <li>How should organisations express which issuers they recognise?</li>
-        <li>How can existing platforms participate without losing the value of their own products?</li>
-        <li>Who should steward an open New Zealand assurance standard?</li>
-      </ul>
-      <div class="cta" style="margin-top:1.9rem">
+      <div class="cta" style="margin-top:1.6rem">
         <a class="btn btn-primary" href="https://github.com/openassurance-nz/openassurance/blob/main/docs/discussion-paper.md">Discussion paper</a>
-        <a class="btn" href="https://github.com/openassurance-nz/openassurance/blob/main/CHARTER.md">Charter</a>
         <a class="btn" href="https://github.com/openassurance-nz/openassurance/issues">Open a discussion</a>
       </div>
     </div>
@@ -595,8 +542,8 @@
   <div class="wrap">
     <div>
       <div style="max-width:26rem">
-        <p><strong>OpenAssurance</strong> is an early-stage New Zealand open standards initiative.</p>
-        <p>Define locally. Issue anywhere. Share anywhere. Verify anywhere.</p>
+        <p><strong>OpenCompetency</strong> is the OpenAssurance profile for assurance information about people.</p>
+        <p>It is not a competency authority, a training provider, or a national worker database.</p>
       </div>
       <div class="domains">
         <a href="https://openassurance.nz">openassurance.nz</a>

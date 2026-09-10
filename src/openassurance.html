@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenAssurance — portable workplace assurance information</title>
+<meta name="description" content="An open standards initiative to make New Zealand workplace assurance information portable, independently verifiable, and exchangeable without requiring every organisation to use the same software platform.">
+<link rel="canonical" href="https://openassurance.nz/">
+<meta property="og:title" content="OpenAssurance">
+<meta property="og:description" content="Compete on assurance management. Cooperate on assurance exchange.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://openassurance.nz/">
+<meta property="og:locale" content="en_NZ">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f766e'/%3E%3Cpath d='M8 16h16M17 10l7 6-7 6' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+{{SITE_CSS}}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="6" fill="currentColor" opacity=".1"/>
+        <path d="M8 16h16M17 10l7 6-7 6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      OpenAssurance
+    </a>
+    <nav class="top-nav" aria-label="Sections">
+      <a href="#problem">Problem</a>
+      <a href="#proposal">Proposal</a>
+      <a href="#profiles">Profiles</a>
+      <a href="#principles">Principles</a>
+      <a href="#status">Status</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <div class="hero" id="top">
+    <div class="wrap">
+      <p class="eyebrow">New Zealand open standards initiative</p>
+      <h1>Assurance information that can move between organisations.</h1>
+      <p class="standfirst">
+        Workplace assurance information should be portable, independently verifiable, and
+        exchangeable without requiring every organisation to use the same software platform.
+      </p>
+      <p class="motto">Compete on assurance management.<br>Cooperate on assurance exchange.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#discussion-paper">Read the discussion paper</a>
+        <a class="btn" href="https://github.com/openassurance-nz/openassurance">View on GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="problem">
+    <div class="wrap">
+      <h2>The same information, entered again and again</h2>
+      <p class="lede">
+        New Zealand organisations rely on digital systems to manage worker qualifications,
+        competency, training, licences, inductions, contractor prequalification, insurance,
+        and supporting evidence.
+      </p>
+      <p>
+        These systems provide real value. The difficulty is that the <em>exchange</em> of assurance
+        information is often coupled to the platform used to manage it.
+      </p>
+      <p>
+        A contractor may already hold verified competency information for its workers, and still
+        be required to recreate those workers and their records inside a customer's nominated
+        system. A supplier may maintain substantially the same organisational information across
+        several prequalification schemes, procurement systems, customer portals, and tenders.
+      </p>
+
+      <div class="stat">
+        <b>76</b>
+        <span>
+          prequalifications completed in a single year by one submitter, cited by the Minister
+          for Workplace Relations and Safety in August 2026.
+          <small>WorkSafe has since released a position statement and a common prequalification template to support a more consistent, risk-based approach.</small>
+        </span>
+      </div>
+
+      <p>
+        A common questionnaire helps organisations ask more consistent questions. The next
+        question is whether valid, current, independently verifiable information should have to
+        be supplied again at all.
+      </p>
+    </div>
+  </section>
+
+  <section id="proposal" class="tinted">
+    <div class="wrap">
+      <h2>An open exchange layer, not another platform</h2>
+      <p>
+        OpenAssurance is not a proposal for a national database, a compulsory worker passport,
+        or another assurance product. It is a proposal to define how assurance records can be
+        issued, held, shared, received, and independently verified — so that existing and future
+        systems can exchange them directly.
+      </p>
+
+      <figure class="flow">
+        <svg viewBox="0 0 520 132" width="520" height="132" role="img"
+             aria-label="Organisation A sends a conforming assurance record through OpenAssurance to Organisation B. Each organisation uses software of its own choosing.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+          <g fill="none" stroke="currentColor" stroke-width="1.25" opacity=".75">
+            <rect x="8" y="34" width="150" height="52" rx="7"/>
+            <rect x="362" y="34" width="150" height="52" rx="7"/>
+          </g>
+          <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="currentColor" text-anchor="middle">
+            <text x="83" y="56" font-weight="600">Organisation A</text>
+            <text x="83" y="74" font-size="11" opacity=".65">its own software</text>
+            <text x="437" y="56" font-weight="600">Organisation B</text>
+            <text x="437" y="74" font-size="11" opacity=".65">different software</text>
+            <text x="260" y="46" font-size="11" font-weight="600" letter-spacing=".06em">OPENASSURANCE</text>
+            <text x="260" y="96" font-size="11" opacity=".65">conforming assurance record</text>
+          </g>
+          <g stroke="currentColor" stroke-width="1.5" marker-end="url(#ah)" opacity=".9">
+            <line x1="166" y1="64" x2="354" y2="64"/>
+          </g>
+        </svg>
+        <figcaption>Neither organisation needs to be a customer of the other's software provider.</figcaption>
+      </figure>
+
+      <p>
+        Open data schemas alone do not achieve this. A schema can be public while the operational
+        pathway for sending or receiving the information still requires platform membership,
+        enterprise licensing, tenant setup, or duplicate records. So the test is deliberately
+        stricter:
+      </p>
+
+      <blockquote class="test">
+        <p>Can Organisation A send a valid assurance record to Organisation B when neither organisation is a customer of the other's software provider?</p>
+        <cite>The core interoperability test</cite>
+      </blockquote>
+
+      <p>
+        The receiving organisation always decides what it requires and accepts. OpenAssurance
+        makes information portable, attributable, and verifiable — it does not decide who is
+        competent or which contractor is acceptable.
+      </p>
+    </div>
+  </section>
+
+  <section id="profiles">
+    <div class="wrap">
+      <h2>Two initial profiles</h2>
+      <p>
+        OpenAssurance is the umbrella initiative. Its first two profiles apply the same exchange
+        model to people and to organisations.
+      </p>
+      <div class="duo">
+        <div class="card">
+          <span class="tag">People</span>
+          <h3>OpenCompetency</h3>
+          <p>
+            Qualifications, licences, training, practical competency, assessments, experience,
+            inductions, employer attestations, and authorisations — with the original issuer of
+            each record remaining identifiable.
+          </p>
+          <a href="https://opencompetency.nz">opencompetency.nz</a>
+        </div>
+        <div class="card">
+          <span class="tag">Organisations</span>
+          <h3>OpenPrequal</h3>
+          <p>
+            Prequalification assessments, insurance, health and safety systems, risk management,
+            incident and plant management, declarations, and supporting evidence — with evidence
+            kept separate from any one assessor's conclusion.
+          </p>
+          <a href="https://openprequal.nz">openprequal.nz</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy" class="tinted">
+    <div class="wrap">
+      <h2>Fewer copies, not more</h2>
+      <p>
+        Assurance records about people are personal information. Every duplicate record is another
+        place requiring access control, security, correction, retention, and breach management.
+      </p>
+      <p>
+        OpenAssurance is designed around purpose-specific presentation rather than wholesale
+        sharing. A customer needing evidence that a worker satisfies one role should not receive
+        that worker's complete competency and employment history. Personal information should be
+        private by default, and the standard should avoid creating a universal worker identifier
+        that enables tracking across unrelated organisations.
+      </p>
+      <blockquote class="test">
+        <p>Are we reducing the amount of personal information organisations need to duplicate and disclose, or are we creating another place to copy it?</p>
+        <cite>The core privacy test</cite>
+      </blockquote>
+      <p>
+        A formal Privacy Impact Assessment will form part of developing any stable specification.
+      </p>
+    </div>
+  </section>
+
+  <section id="principles">
+    <div class="wrap">
+      <h2>Founding principles</h2>
+      <p>Offered for discussion, and set out in full in the project charter.</p>
+      <ol class="principles">
+        <li><b>No mandatory platform.</b> <span>Exchange must not require a shared subscription.</span></li>
+        <li><b>No mandatory central registry.</b> <span>Not another central database.</span></li>
+        <li><b>Portable records.</b> <span>Changing provider must not invalidate a record.</span></li>
+        <li><b>Independent verification.</b> <span>Verifiable without platform membership.</span></li>
+        <li><b>Local acceptance.</b> <span>The receiving organisation decides.</span></li>
+        <li><b>Issuer provenance.</b> <span>Sharing a record does not make you its issuer.</span></li>
+        <li><b>Open exchange.</b> <span>No bilateral proprietary integrations required.</span></li>
+        <li><b>Privacy by design.</b> <span>Purpose-bound and limited to what is necessary.</span></li>
+        <li><b>No universal worker identifier.</b> <span>No tracking across unrelated organisations.</span></li>
+        <li><b>Small organisations can participate.</b> <span>No specialist IT infrastructure needed.</span></li>
+        <li><b>Reuse existing standards first.</b> <span>Prefer established open standards.</span></li>
+        <li><b>Vendor neutrality.</b> <span>Providers compete on services around the exchange layer.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="not" class="tinted">
+    <div class="wrap">
+      <h2>What OpenAssurance is not</h2>
+      <p>
+        Existing competency, prequalification, assessment, and contractor-management products
+        should be able to support OpenAssurance without abandoning their commercial models. They
+        continue to compete on assessment, workflow, reporting, automation, and user experience.
+        What changes is that the underlying record can move.
+      </p>
+      <ul class="nots">
+        <li>Not a national worker database</li>
+        <li>Not a compulsory competency passport</li>
+        <li>Not a prequalification provider</li>
+        <li>Not an assessment company</li>
+        <li>Not a training provider</li>
+        <li>Not an accreditation authority</li>
+        <li>Not a central issuer registry</li>
+        <li>Not a replacement for existing assessment schemes</li>
+        <li>Not a replacement for commercial assurance software</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="status">
+    <div class="wrap">
+      <h2>Where this is up to</h2>
+      <p class="lede">
+        OpenAssurance is an early-stage proposal, not a completed standard. No exchange protocol,
+        schema, or conformance suite exists yet.
+      </p>
+      <ol class="phases">
+        <li class="now">
+          <b>Validate the problem <span class="now-tag">Current</span></b>
+          <span>Test the problem and assumptions with contractors, buyers, asset owners, regulators, industry organisations, assessment providers, and technology providers.</span>
+        </li>
+        <li>
+          <b>Map existing standards</b>
+          <span>Identify what already exists and should be adopted rather than recreated.</span>
+        </li>
+        <li>
+          <b>Define the minimum exchange model</b>
+          <span>A small v0.1 specification covering only what interoperability requires.</span>
+        </li>
+        <li>
+          <b>Demonstrate two reference exchanges</b>
+          <span>One competency example, one prequalification example.</span>
+        </li>
+        <li>
+          <b>Develop conformance tests</b>
+          <span>Define what a system must support before claiming compatibility.</span>
+        </li>
+        <li>
+          <b>Establish longer-term governance</b>
+          <span>Determine an independent stewardship model based on industry participation.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="discussion-paper" class="tinted">
+    <div class="wrap">
+      <h2>Questions we would like answered</h2>
+      <p>
+        The discussion paper sets out the problem, the proposed model, and the open questions in
+        full. Disagreement is genuinely useful at this stage — including reasons the approach
+        will not work.
+      </p>
+      <ul class="questions">
+        <li>How much assurance information is actually duplicated across New Zealand organisations, and where does it cost the most?</li>
+        <li>Are competency and prequalification the right first use cases?</li>
+        <li>What is the minimum information that needs to move between systems?</li>
+        <li>How should organisations express which issuers they recognise?</li>
+        <li>How can existing platforms participate without losing the value of their own products?</li>
+        <li>Who should steward an open New Zealand assurance standard?</li>
+      </ul>
+      <div class="cta" style="margin-top:1.9rem">
+        <a class="btn btn-primary" href="https://github.com/openassurance-nz/openassurance/blob/main/docs/discussion-paper.md">Discussion paper</a>
+        <a class="btn" href="https://github.com/openassurance-nz/openassurance/blob/main/CHARTER.md">Charter</a>
+        <a class="btn" href="https://github.com/openassurance-nz/openassurance/issues">Open a discussion</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div style="max-width:26rem">
+        <p><strong>OpenAssurance</strong> is an early-stage New Zealand open standards initiative.</p>
+        <p>Define locally. Issue anywhere. Share anywhere. Verify anywhere.</p>
+      </div>
+      <div class="domains">
+        <a href="https://openassurance.nz">openassurance.nz</a>
+        <a href="https://opencompetency.nz">opencompetency.nz</a>
+        <a href="https://openprequal.nz">openprequal.nz</a>
+        <a href="https://github.com/openassurance-nz/openassurance">github.com/openassurance-nz</a>
+      </div>
+    </div>
+    <p class="fineprint">
+      References to external organisations, publications, and government initiatives indicate that
+      the problem described here is recognised. No such reference implies consultation,
+      participation, support, or endorsement. Documentation is published under the Apache
+      License 2.0. This site sets no cookies and uses no analytics or third-party scripts.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
