@@ -46,9 +46,11 @@ SITES = {
 # Where the holding redirects point while the profile sites are not yet live.
 HOLDING_TARGET = "openassurance.nz"
 
-# Domains parked on the umbrella site as cPanel Aliases for now. Empty this
-# list once each one has a document root of its own.
-HELD_ALIASES = ("opencompetency.nz", "openprequal.nz")
+# Domains parked on the umbrella site as cPanel Aliases, awaiting a document
+# root of their own. Empty now that all three sites are hosted separately.
+# Adding a domain back here reinstates both its holding redirect and the
+# temporary block in the umbrella .htaccess.
+HELD_ALIASES = ()
 
 PLACEHOLDER = "{{SITE_CSS}}"
 ACCENT_PLACEHOLDER = "{{SITE_ACCENT}}"
@@ -363,8 +365,8 @@ def main():
         print("%-22s -> dist/%s/  (index %d KB, + 404, .htaccess, robots, sitemap)"
               % (source_name, domain, size))
 
-        # A holding version for domains whose own site is not live yet.
-        if site.get("holding_anchor") is not None:
+        # A holding version, only while this domain is still parked.
+        if site.get("holding_anchor") is not None and domain in HELD_ALIASES:
             hold = ROOT / "holding" / domain
             write(hold / ".htaccess", holding_htaccess(site, HOLDING_TARGET, site["holding_anchor"]))
             write(hold / "index.html", holding_page(site, HOLDING_TARGET, site["holding_anchor"], css, accent))
@@ -377,7 +379,7 @@ def main():
     for site in SITES.values():
         for filename in ("index.html", "404.html"):
             checks.append(ROOT / "dist" / site["domain"] / filename)
-        if site.get("holding_anchor") is not None:
+        if site.get("holding_anchor") is not None and site["domain"] in HELD_ALIASES:
             checks.append(ROOT / "holding" / site["domain"] / "index.html")
 
     for path in checks:

@@ -34,41 +34,21 @@ Each folder contains:
 
 `.htaccess` begins with a dot, so it is hidden by default. In cPanel File Manager, enable **Settings → Show Hidden Files (dotfiles)** before uploading, or it will be silently skipped.
 
-## Holding the profile domains on the umbrella site
+## Promoting a domain from alias to its own site
 
-While `opencompetency.nz` and `openprequal.nz` do not have their own sites yet, they can be pointed at the umbrella site at no extra hosting cost.
+A domain added with cPanel's **Share document root** option is an *alias*: it serves the primary site's files and cannot be given a root of its own later. cPanel warns that the setting is permanent, and it means it. Converting one is a remove-and-re-add, not an edit.
 
-DNS alone cannot do this. DNS maps a name to an IP address and has no concept of URLs or redirects, so pointing those domains at the hosting IP without configuring them just lands visitors on the server's default page.
+To give `opencompetency.nz` or `openprequal.nz` a site of its own:
 
-Use a cPanel **Alias** (called *Parked Domain* on older versions) instead of an Addon Domain:
+1. cPanel → **Domains** → remove the domain.
+2. Add it again, this time **without** ticking *Share document root*, and note the document root it is given.
+3. Upload that domain's `dist/<domain>/` contents to that root, hidden files included.
+4. Remove the domain from `HELD_ALIASES` in `build.py`, rebuild, and upload the regenerated `dist/openassurance.nz/.htaccess`.
+5. Run **AutoSSL**.
 
-1. cPanel → **Aliases** → add `opencompetency.nz` and `openprequal.nz`.
-2. Point each domain's `A` records, apex and `www`, at the hosting IP.
-3. Run **AutoSSL** so the certificate covers all three names.
+**Do steps 1 to 3 before step 4.** The umbrella `.htaccess` sends any host that is not `openassurance.nz` to the canonical site with a **301**, and that rule is what remains once the temporary 302 block is removed. Upload it while the domain is still an alias and visitors — and search engines — cache a permanent redirect away from a site that is about to exist.
 
-An alias serves the primary site's document root, so the redirect rule already present in `dist/openassurance.nz/.htaccess` takes over: requests arriving with an alias `Host` header get a **302** to `https://openassurance.nz/#profiles`.
-
-Aliases are usually unmetered on plans that limit addon domains, which is what makes this free. Check your plan if unsure.
-
-The redirect is a 302, never a 301. A permanent redirect is cached hard by browsers and search engines, and these domains are going to become sites of their own — a cached 301 would keep sending visitors away from them long after they existed.
-
-### Promoting a profile site later
-
-1. Remove the domain from **Aliases**, add it as an **Addon Domain** with its own document root.
-2. Delete that domain from `HELD_ALIASES` in `build.py` and rebuild, which removes the temporary block from the umbrella `.htaccess`.
-3. Upload that site's `dist/<domain>/` contents to its new document root, and the rebuilt umbrella `.htaccess`.
-4. Re-run AutoSSL.
-
-The `holding/<domain>/` folders are an alternative for hosts without alias support: a document root containing only a redirecting `.htaccess` and a meta-refresh fallback page.
-
-## Setting up the domains in cPanel
-
-The primary domain of the hosting account uses `public_html/` as its document root. The other two are added as **Addon Domains**, each of which gets its own folder, typically `public_html/<domain>/`.
-
-Two things to check on an Economy plan before relying on this:
-
-1. **How many addon domains the plan allows.** If it permits only one website, the other two domains will need either their own hosting, or a redirect until the plan is upgraded.
-2. **That an addon domain's document root is not nested inside another site's.** cPanel defaults to `public_html/<domain>/`, which means the addon site is also reachable at `primarydomain.nz/<domain>/`. That produces duplicate content at two URLs. The `.htaccess` canonical redirect handles it — requests to the wrong host are sent to the right one — but a document root outside `public_html/` is cleaner if the plan allows it.
+Separate document roots also mean separate vhosts, so each domain can hold its own certificate. That usually removes the obstacle where AutoSSL declines to replace a still-valid third-party certificate shared across aliases.
 
 ## HTTPS
 
