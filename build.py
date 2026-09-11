@@ -148,6 +148,15 @@ ErrorDocument 404 /404.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # Certificate validation must never be redirected. cPanel AutoSSL, Let's
+  # Encrypt and DigiCert all validate by fetching a file under /.well-known/
+  # on each domain — acme-challenge/ or pki-validation/ depending on the
+  # provider — and must receive the file itself. A redirect fails issuance and
+  # silent renewal, and the error it produces does not point back here.
+  # Keep this rule first, and exclude the whole directory so a change of
+  # certificate provider does not quietly break renewal.
+  RewriteRule ^\\.well-known/ - [L]
 %(alias_block)s
   # Canonical host: https, no www, and not any alias parked on this account.
   RewriteCond %%{HTTPS} !=on [OR]
@@ -207,7 +216,10 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Everything, including www and any path, goes to the umbrella site.
+  # Certificate validation must never be redirected. Keep this rule first.
+  RewriteRule ^\\.well-known/ - [L]
+
+  # Everything else, including www and any path, goes to the umbrella site.
   RewriteRule ^ https://%(target)s/%(anchor)s [L,R=302]
 </IfModule>
 

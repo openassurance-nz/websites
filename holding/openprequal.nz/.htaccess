@@ -12,7 +12,10 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Everything, including www and any path, goes to the umbrella site.
+  # Certificate validation must never be redirected. Keep this rule first.
+  RewriteRule ^\.well-known/ - [L]
+
+  # Everything else, including www and any path, goes to the umbrella site.
   RewriteRule ^ https://openassurance.nz/#profiles [L,R=302]
 </IfModule>
 

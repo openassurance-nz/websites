@@ -7,6 +7,15 @@ ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Certificate validation must never be redirected. cPanel AutoSSL, Let's
+  # Encrypt and DigiCert all validate by fetching a file under /.well-known/
+  # on each domain — acme-challenge/ or pki-validation/ depending on the
+  # provider — and must receive the file itself. A redirect fails issuance and
+  # silent renewal, and the error it produces does not point back here.
+  # Keep this rule first, and exclude the whole directory so a change of
+  # certificate provider does not quietly break renewal.
+  RewriteRule ^\.well-known/ - [L]
+
   # --- TEMPORARY ---------------------------------------------------------
   # These domains are parked on this account as cPanel Aliases until they
   # get sites of their own. R=302, never 301: a permanent redirect would be

@@ -70,6 +70,8 @@ Two things to check on an Economy plan before relying on this:
 
 ## HTTPS
 
+**Upload the current `.htaccess` before running AutoSSL.** Certificate validation fetches a file under `/.well-known/` on each domain, and the redirect rules would otherwise send that request to the umbrella site instead of serving the file. Issuance fails, and the error does not mention redirects. The rule excluding `/.well-known/` is first in every `.htaccess` for that reason — leave it there, including at renewal time, or certificates will stop renewing silently.
+
 Enable SSL for all three domains before announcing them. Crazy Domains provides free Let's Encrypt certificates on Linux hosting via cPanel's **SSL/TLS Status** page.
 
 The `.htaccess` redirects HTTP to HTTPS, so a certificate must exist first or visitors hit a browser warning.
