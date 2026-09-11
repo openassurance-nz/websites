@@ -8,6 +8,8 @@ The three OpenAssurance sites:
 | [opencompetency.nz](https://opencompetency.nz) | The profile for people: competency, qualifications, attestations |
 | [openprequal.nz](https://openprequal.nz) | The profile for organisations: prequalification, evidence, assessment |
 
+All three are live, each self-contained: no web fonts, CDN scripts, analytics, third-party resources or cookies, under a Content-Security-Policy that forbids external resources outright.
+
 The standard itself — charter, problem statement, privacy principles, architecture, discussion paper, and both profiles — lives in the [openassurance](https://github.com/openassurance-nz/openassurance) repository. This repository contains only the sites.
 
 ## Why one repository for three sites

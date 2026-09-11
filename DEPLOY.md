@@ -6,6 +6,20 @@ Hosting is an entry-level cPanel shared-hosting account running Apache or LiteSp
 
 Nothing below is specific to a particular hosting company. Where a step names a cPanel screen, any cPanel host has the same one.
 
+## Current configuration
+
+All three sites are live, each with its own document root and its own certificate.
+
+| Domain | Document root | Certificate | Renews |
+|---|---|---|---|
+| openassurance.nz | the account's primary root | DigiCert RapidSSL, expires **28 March 2027** | **No — manual** |
+| opencompetency.nz | its own root | Let's Encrypt, via AutoSSL | Yes, automatically |
+| openprequal.nz | its own root | Let's Encrypt, via AutoSSL | Yes, automatically |
+
+**The openassurance.nz certificate does not renew itself.** It was issued by the registrar rather than AutoSSL, and AutoSSL will not replace a third-party certificate while it remains valid. Either let it lapse close to expiry so AutoSSL takes over, or delete it under *SSL/TLS → Manage SSL sites* and run AutoSSL, which brings it onto the same automatic footing as the other two. Doing that deliberately, well before March 2027, is safer than discovering it on the day.
+
+The `/.well-known/` exclusion at the top of every `.htaccess` is what keeps the automatic renewals working. Removing it breaks renewal silently, months later.
+
 ## What to upload
 
 Build first:
