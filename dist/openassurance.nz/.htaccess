@@ -24,12 +24,11 @@ ErrorDocument 404 /404.html
   # NE (noescape) is required. Without it mod_rewrite percent-encodes the
   # substitution, turning the "#" into "%23" — a literal path segment that
   # 404s, rather than a fragment.
-  # E=NOCACHE marks this response so the header block below forbids caching
-  # it. Without that, mod_expires applies the text/html rule to the redirect
-  # and browsers replay it for an hour — which both hides any correction made
-  # here and defeats the point of using a temporary redirect at all.
+  # This redirect must never be cached, or a browser replays it long after
+  # the target changes. Cache policy below is scoped to real files only, so
+  # this response goes out with no Cache-Control at all and stays fresh.
   RewriteCond %{HTTP_HOST} ^(www\.)?(opencompetency|openprequal)\.nz$ [NC]
-  RewriteRule ^ https://openassurance.nz/#profiles [L,NE,R=302,E=NOCACHE:1]
+  RewriteRule ^ https://openassurance.nz/#profiles [L,NE,R=302]
   # --- end TEMPORARY -----------------------------------------------------
 
   # Canonical host: https, no www, and not any alias parked on this account.
@@ -52,8 +51,15 @@ ErrorDocument 404 /404.html
   # build time: scripts are banned, styles and images may only be inline.
   Header always set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 
-  # Temporary redirects must never be cached. See E=NOCACHE above.
-  Header always set Cache-Control "no-store" env=NOCACHE
+  # Cache policy lives here rather than in mod_expires, which cannot be made
+  # conditional. mod_expires writes to a different header table, so a
+  # "Header always set" beside it produces two conflicting Cache-Control
+  # headers rather than replacing one. FilesMatch only matches real files, so
+  # a redirect response never picks this up and stays uncacheable — which is
+  # what a temporary redirect has to be.
+  <FilesMatch "\.(html|txt|xml)$">
+    Header set Cache-Control "max-age=600"
+  </FilesMatch>
 
   # Enable only once HTTPS is confirmed working on this domain. Browsers
   # remember it, so a premature one is hard to undo.
@@ -67,9 +73,7 @@ ErrorDocument 404 /404.html
 <IfModule mod_expires.c>
   ExpiresActive On
 
-  # Ten minutes, not an hour. These are single-page sites under active
-  # revision, and a long HTML cache means a correction is invisible to anyone
-  # who has already visited until it expires.
-  ExpiresByType text/html "access plus 10 minutes"
+  # Images only. HTML cache policy is set in the mod_headers block above, so
+  # that redirect responses are never given one.
   ExpiresByType image/svg+xml "access plus 1 week"
 </IfModule>
