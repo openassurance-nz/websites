@@ -1,0 +1,80 @@
+# Deploying
+
+The sites are plain static HTML. No PHP, no database, no build step on the server.
+
+Current hosting is a Crazy Domains Linux Hosting (Economy) cPanel account, which runs Apache or LiteSpeed — both read the `.htaccess` file included in each build.
+
+## What to upload
+
+Build first:
+
+```
+python build.py
+```
+
+Each `dist/<domain>/` folder is the complete document root for that domain. Upload its **contents** — not the folder itself — to that domain's document root:
+
+```text
+dist/openassurance.nz/    ->  document root for openassurance.nz
+dist/opencompetency.nz/   ->  document root for opencompetency.nz
+dist/openprequal.nz/      ->  document root for openprequal.nz
+```
+
+Each folder contains:
+
+| File | Purpose |
+|---|---|
+| `index.html` | The entire site |
+| `404.html` | Not-found page |
+| `.htaccess` | HTTPS and canonical host redirect, security headers, compression |
+| `robots.txt` | Crawler permissions |
+| `sitemap.xml` | Single-page sitemap |
+
+`.htaccess` begins with a dot, so it is hidden by default. In cPanel File Manager, enable **Settings → Show Hidden Files (dotfiles)** before uploading, or it will be silently skipped.
+
+## Setting up the domains in cPanel
+
+The primary domain of the hosting account uses `public_html/` as its document root. The other two are added as **Addon Domains**, each of which gets its own folder, typically `public_html/<domain>/`.
+
+Two things to check on an Economy plan before relying on this:
+
+1. **How many addon domains the plan allows.** If it permits only one website, the other two domains will need either their own hosting, or a redirect until the plan is upgraded.
+2. **That an addon domain's document root is not nested inside another site's.** cPanel defaults to `public_html/<domain>/`, which means the addon site is also reachable at `primarydomain.nz/<domain>/`. That produces duplicate content at two URLs. The `.htaccess` canonical redirect handles it — requests to the wrong host are sent to the right one — but a document root outside `public_html/` is cleaner if the plan allows it.
+
+## HTTPS
+
+Enable SSL for all three domains before announcing them. Crazy Domains provides free Let's Encrypt certificates on Linux hosting via cPanel's **SSL/TLS Status** page.
+
+The `.htaccess` redirects HTTP to HTTPS, so a certificate must exist first or visitors hit a browser warning.
+
+Once HTTPS is confirmed working on a domain, you can uncomment the HSTS line in that site's `.htaccess`:
+
+```apache
+# Header always set Strict-Transport-Security "max-age=31536000"
+```
+
+**Do not enable HSTS before HTTPS works.** Browsers remember the instruction for the full max-age and will refuse to load the site over HTTP, so a premature HSTS header is difficult to undo — it persists in visitors' browsers even after you remove it from the server.
+
+Do not edit `.htaccess` on the server. Edit `build.py`, rebuild, and upload — a server-side edit is lost on the next deploy.
+
+## DNS
+
+Each domain needs A records pointing at the hosting account's IP address, shown in cPanel under **Shared IP Address**. If the domains are registered with Crazy Domains as well, this is usually already configured when the domain is attached to the hosting.
+
+Point both the apex (`openassurance.nz`) and `www` at the host. The `.htaccess` redirects `www` to the apex, but the record has to resolve first for that redirect to run.
+
+## Verifying a deployment
+
+After uploading, check each site:
+
+- `https://<domain>/` loads and shows the correct accent colour;
+- `http://<domain>/` redirects to HTTPS;
+- `https://www.<domain>/` redirects to the apex;
+- `https://<domain>/nonexistent` shows the 404 page, not the host's default error page;
+- the browser console is empty. A Content-Security-Policy violation here would mean something external crept into the page.
+
+The last check matters. The `.htaccess` sets a policy that forbids all external resources, which enforces on the server what `build.py` checks at build time.
+
+## Moving off shared hosting later
+
+Nothing here is specific to this host beyond `.htaccess`. The same `dist/` folders deploy unchanged to Cloudflare Pages, Netlify, or any static host — those platforms ignore `.htaccess` and take equivalent settings from their own configuration, so the redirect and header rules would need restating there.

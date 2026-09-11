@@ -22,12 +22,15 @@ Every built page is completely self-contained: no web fonts, no CDN scripts, no 
 
 ```text
 shared/site.css        The design, shared by all three sites
-src/*.html             Page sources, each with a {{SITE_CSS}} placeholder
-build.py               Inlines the CSS and checks for external requests
-dist/<domain>/         Built output, one folder per site
+src/*.html             Page sources, with {{SITE_CSS}} and {{SITE_ACCENT}} placeholders
+build.py               Inlines the CSS, emits each site, checks for external requests
+dist/<domain>/         Built output: one complete document root per site
+DEPLOY.md              How to deploy to the current host
 ```
 
-Each site sets its own `--accent` colours in its source file, after the shared CSS. Everything else is common, so the three read as one family.
+Per-site accent colours are defined once in `build.py` and applied to both the page and its 404. Everything else is common, so the three read as one family.
+
+Each `dist/<domain>/` folder is a complete document root — `index.html`, `404.html`, `.htaccess`, `robots.txt`, `sitemap.xml` — ready to upload as-is.
 
 `dist/` is committed. Any static host can serve it directly, and nobody needs to run a build to publish a change.
 
@@ -37,7 +40,13 @@ Each site sets its own `--accent` colours in its source file, after the shared C
 python build.py
 ```
 
-No dependencies beyond Python 3. The build fails if a source file loses its `{{SITE_CSS}}` placeholder, or if a built page would make an external request.
+No dependencies beyond Python 3. The build fails if a source file loses its `{{SITE_CSS}}` placeholder, or if a built page would make an external request on load.
+
+That last check is not decoration. The `.htaccess` it emits sets a Content-Security-Policy forbidding all external resources, so a page that acquired one would break in the browser rather than quietly phone home. Build-time and runtime enforce the same rule.
+
+## Deploying
+
+See [DEPLOY.md](DEPLOY.md).
 
 ## Local preview
 

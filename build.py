@@ -7,6 +7,9 @@ another, which is exactly what the standard argues against. The shared design is
 therefore shared at source level and inlined here, leaving three completely
 self-contained pages that make no external requests at all.
 
+Output is deploy-ready for ordinary Apache/LiteSpeed shared hosting: each
+dist/<domain>/ folder is the document root for that domain, uploaded as-is.
+
 Usage:  python build.py
 """
 
@@ -17,12 +20,28 @@ import sys
 
 ROOT = pathlib.Path(__file__).parent
 CSS = ROOT / "shared" / "site.css"
+
 SITES = {
-    "openassurance.html": "openassurance.nz",
-    "opencompetency.html": "opencompetency.nz",
-    "openprequal.html": "openprequal.nz",
+    "openassurance.html": {
+        "domain": "openassurance.nz",
+        "name": "OpenAssurance",
+        # The umbrella site uses the palette's own accent; the profiles override it.
+        "accent": None,
+    },
+    "opencompetency.html": {
+        "domain": "opencompetency.nz",
+        "name": "OpenCompetency",
+        "accent": ("#1d4ed8", "#e6edfd", "#1b47b4", "#93b4fd", "#1a2440", "#bfd0fe"),
+    },
+    "openprequal.html": {
+        "domain": "openprequal.nz",
+        "name": "OpenPrequal",
+        "accent": ("#a1571a", "#f6ede2", "#8a4a15", "#eab676", "#33261a", "#f3cfa2"),
+    },
 }
+
 PLACEHOLDER = "{{SITE_CSS}}"
+ACCENT_PLACEHOLDER = "{{SITE_ACCENT}}"
 
 # Patterns that make a browser fetch something on load. Deliberately excluded:
 # href on an <a> (the visitor has to click it), an xmlns namespace URI (it names
@@ -38,7 +57,6 @@ FETCHERS = (
 LINK_TAG = re.compile(r"<link\b[^>]*>", re.I)
 LINK_REL = re.compile(r"""rel\s*=\s*["']([^"']+)["']""", re.I)
 LINK_HREF = re.compile(r"""href\s*=\s*["']((?:https?:)?//[^"']*)["']""", re.I)
-# rel values that cause a fetch, as opposed to describing the document.
 FETCHING_RELS = {
     "stylesheet", "icon", "shortcut icon", "apple-touch-icon", "mask-icon",
     "manifest", "preload", "prefetch", "preconnect", "dns-prefetch", "prerender",
@@ -52,6 +70,23 @@ def read(path):
 def write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
     io.open(path, "w", encoding="utf-8", newline="\n").write(text)
+
+
+def accent_css(accent):
+    """Per-site accent overrides, applied after the shared palette."""
+    if accent is None:
+        return "  /* This site uses the shared palette's own accent. */"
+    light_a, light_soft, light_ink, dark_a, dark_soft, dark_ink = accent
+    light = "--accent: %s; --accent-soft: %s; --accent-ink: %s;" % (light_a, light_soft, light_ink)
+    dark = "--accent: %s; --accent-soft: %s; --accent-ink: %s;" % (dark_a, dark_soft, dark_ink)
+    return "\n".join([
+        "  /* --- site identity ---------------------------------------------------- */",
+        "  :root { %s }" % light,
+        "  @media (prefers-color-scheme: dark) {",
+        "    :root:not([data-theme=\"light\"]) { %s }" % dark,
+        "  }",
+        "  :root[data-theme=\"dark\"] { %s }" % dark,
+    ])
 
 
 def external_requests(page):
@@ -69,11 +104,115 @@ def external_requests(page):
             yield "%s (rel=%s)" % (href.group(1), rel.group(1))
 
 
+def htaccess(domain):
+    """Apache/LiteSpeed config for shared hosting.
+
+    HSTS is left commented out deliberately: enabling it before HTTPS is
+    confirmed working on the domain makes the site unreachable for the duration
+    of the max-age, and browsers honour it even after it is removed.
+    """
+    return """# %(domain)s — static site, no PHP required.
+
+DirectoryIndex index.html
+Options -Indexes
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Canonical host: https, no www.
+  RewriteCond %%{HTTPS} !=on [OR]
+  RewriteCond %%{HTTP_HOST} ^www\\. [NC]
+  RewriteRule ^ https://%(domain)s%%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+
+  # Outbound links carry no referrer, so linked sites learn nothing about
+  # where the visitor came from.
+  Header always set Referrer-Policy "no-referrer"
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=()"
+
+  # The pages are entirely self-contained, so everything external can be
+  # forbidden outright. This enforces at the server what build.py checks at
+  # build time: scripts are banned, styles and images may only be inline.
+  Header always set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+
+  # Enable only once HTTPS is confirmed working on this domain. Browsers
+  # remember it, so a premature one is hard to undo.
+  # Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 1 hour"
+  ExpiresByType image/svg+xml "access plus 1 week"
+</IfModule>
+""" % {"domain": domain}
+
+
+def robots(domain):
+    return """User-agent: *
+Allow: /
+
+Sitemap: https://%s/sitemap.xml
+""" % domain
+
+
+def sitemap(domain):
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://%s/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+</urlset>
+""" % domain
+
+
+def not_found(site, css, accent):
+    return """<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found — %(name)s</title>
+<meta name="robots" content="noindex">
+<style>
+%(css)s
+%(accent)s
+  main.notfound { padding: 6rem 0 7rem; }
+</style>
+</head>
+<body>
+<main class="notfound">
+  <div class="wrap">
+    <p class="eyebrow">404</p>
+    <h1 style="font-size:clamp(1.8rem,5vw,2.4rem)">That page isn't here.</h1>
+    <p class="standfirst">%(name)s is a single page, so there is not much to get lost in.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="/">Go to %(domain)s</a>
+      <a class="btn" href="https://github.com/openassurance-nz/openassurance">View on GitHub</a>
+    </div>
+  </div>
+</main>
+</body>
+</html>
+""" % {"name": site["name"], "domain": site["domain"], "css": css, "accent": accent}
+
+
 def main():
     css = read(CSS).rstrip("\n")
     failed = False
 
-    for source_name, domain in SITES.items():
+    for source_name, site in SITES.items():
+        domain = site["domain"]
         page = read(ROOT / "src" / source_name)
 
         if PLACEHOLDER not in page:
@@ -81,20 +220,32 @@ def main():
             failed = True
             continue
 
-        page = page.replace(PLACEHOLDER, css)
-        write(ROOT / "dist" / domain / "index.html", page)
+        accent = accent_css(site["accent"])
+        page = page.replace(PLACEHOLDER, css).replace(ACCENT_PLACEHOLDER, accent)
+
+        out = ROOT / "dist" / domain
+        write(out / "index.html", page)
+        write(out / "404.html", not_found(site, css, accent))
+        write(out / ".htaccess", htaccess(domain))
+        write(out / "robots.txt", robots(domain))
+        write(out / "sitemap.xml", sitemap(domain))
+
         size = len(page.encode("utf-8")) // 1024
-        print("%-22s -> dist/%s/index.html  (%d KB)" % (source_name, domain, size))
+        print("%-22s -> dist/%s/  (index %d KB, + 404, .htaccess, robots, sitemap)"
+              % (source_name, domain, size))
 
     if failed:
         return 1
 
-    for domain in SITES.values():
-        for problem in external_requests(read(ROOT / "dist" / domain / "index.html")):
-            print("ERROR: dist/%s would fetch: %s" % (domain, problem))
-            failed = True
+    for site in SITES.values():
+        for filename in ("index.html", "404.html"):
+            path = ROOT / "dist" / site["domain"] / filename
+            for problem in external_requests(read(path)):
+                print("ERROR: dist/%s/%s would fetch: %s" % (site["domain"], filename, problem))
+                failed = True
 
-    print("no external requests in any built page" if not failed else "")
+    if not failed:
+        print("no external requests in any built page")
     return 1 if failed else 0
 
 
