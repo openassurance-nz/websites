@@ -7,9 +7,9 @@ ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Canonical host: https, no www.
+  # Canonical host: https, no www, and not any alias parked on this account.
   RewriteCond %{HTTPS} !=on [OR]
-  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteCond %{HTTP_HOST} !^openprequal\.nz$ [NC]
   RewriteRule ^ https://openprequal.nz%{REQUEST_URI} [L,R=301]
 </IfModule>
 

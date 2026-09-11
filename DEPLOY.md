@@ -32,6 +32,33 @@ Each folder contains:
 
 `.htaccess` begins with a dot, so it is hidden by default. In cPanel File Manager, enable **Settings → Show Hidden Files (dotfiles)** before uploading, or it will be silently skipped.
 
+## Holding the profile domains on the umbrella site
+
+While `opencompetency.nz` and `openprequal.nz` do not have their own sites yet, they can be pointed at the umbrella site at no extra hosting cost.
+
+DNS alone cannot do this. DNS maps a name to an IP address and has no concept of URLs or redirects, so pointing those domains at the hosting IP without configuring them just lands visitors on the server's default page.
+
+Use a cPanel **Alias** (called *Parked Domain* on older versions) instead of an Addon Domain:
+
+1. cPanel → **Aliases** → add `opencompetency.nz` and `openprequal.nz`.
+2. Point each domain's `A` records, apex and `www`, at the hosting IP.
+3. Run **AutoSSL** so the certificate covers all three names.
+
+An alias serves the primary site's document root, so the redirect rule already present in `dist/openassurance.nz/.htaccess` takes over: requests arriving with an alias `Host` header get a **302** to `https://openassurance.nz/#profiles`.
+
+Aliases are usually unmetered on plans that limit addon domains, which is what makes this free. Check your plan if unsure.
+
+The redirect is a 302, never a 301. A permanent redirect is cached hard by browsers and search engines, and these domains are going to become sites of their own — a cached 301 would keep sending visitors away from them long after they existed.
+
+### Promoting a profile site later
+
+1. Remove the domain from **Aliases**, add it as an **Addon Domain** with its own document root.
+2. Delete that domain from `HELD_ALIASES` in `build.py` and rebuild, which removes the temporary block from the umbrella `.htaccess`.
+3. Upload that site's `dist/<domain>/` contents to its new document root, and the rebuilt umbrella `.htaccess`.
+4. Re-run AutoSSL.
+
+The `holding/<domain>/` folders are an alternative for hosts without alias support: a document root containing only a redirecting `.htaccess` and a meta-refresh fallback page.
+
 ## Setting up the domains in cPanel
 
 The primary domain of the hosting account uses `public_html/` as its document root. The other two are added as **Addon Domains**, each of which gets its own folder, typically `public_html/<domain>/`.

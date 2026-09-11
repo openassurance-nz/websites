@@ -7,9 +7,18 @@ ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Canonical host: https, no www.
+  # --- TEMPORARY ---------------------------------------------------------
+  # These domains are parked on this account as cPanel Aliases until they
+  # get sites of their own. R=302, never 301: a permanent redirect would be
+  # cached by browsers and search engines long after those sites went live.
+  # Delete this block when opencompetency.nz and openprequal.nz move to their own document roots.
+  RewriteCond %{HTTP_HOST} ^(www\.)?(opencompetency|openprequal)\.nz$ [NC]
+  RewriteRule ^ https://openassurance.nz/#profiles [L,R=302]
+  # --- end TEMPORARY -----------------------------------------------------
+
+  # Canonical host: https, no www, and not any alias parked on this account.
   RewriteCond %{HTTPS} !=on [OR]
-  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteCond %{HTTP_HOST} !^openassurance\.nz$ [NC]
   RewriteRule ^ https://openassurance.nz%{REQUEST_URI} [L,R=301]
 </IfModule>
 
