@@ -2,7 +2,9 @@
 
 The sites are plain static HTML. No PHP, no database, no build step on the server.
 
-Current hosting is a Crazy Domains Linux Hosting (Economy) cPanel account, which runs Apache or LiteSpeed — both read the `.htaccess` file included in each build.
+Hosting is an entry-level cPanel shared-hosting account running Apache or LiteSpeed. Both read the `.htaccess` file included in each build.
+
+Nothing below is specific to a particular hosting company. Where a step names a cPanel screen, any cPanel host has the same one.
 
 ## What to upload
 
@@ -72,7 +74,7 @@ Two things to check on an Economy plan before relying on this:
 
 **Upload the current `.htaccess` before running AutoSSL.** Certificate validation fetches a file under `/.well-known/` on each domain, and the redirect rules would otherwise send that request to the umbrella site instead of serving the file. Issuance fails, and the error does not mention redirects. The rule excluding `/.well-known/` is first in every `.htaccess` for that reason — leave it there, including at renewal time, or certificates will stop renewing silently.
 
-Enable SSL for all three domains before announcing them. Crazy Domains provides free Let's Encrypt certificates on Linux hosting via cPanel's **SSL/TLS Status** page.
+Enable SSL for all three domains before announcing them. cPanel issues free certificates through **SSL/TLS Status** → AutoSSL, where the host has it enabled.
 
 The `.htaccess` redirects HTTP to HTTPS, so a certificate must exist first or visitors hit a browser warning.
 
@@ -88,7 +90,9 @@ Do not edit `.htaccess` on the server. Edit `build.py`, rebuild, and upload — 
 
 ## DNS
 
-Each domain needs A records pointing at the hosting account's IP address, shown in cPanel under **Shared IP Address**. If the domains are registered with Crazy Domains as well, this is usually already configured when the domain is attached to the hosting.
+Each domain needs A records pointing at the hosting account's IP address, shown in cPanel under **Shared IP Address**.
+
+A newly registered domain often points at the registrar's parking service instead. Parking pages commonly carry advertising and tracking, and present a certificate for the registrar's own domain rather than yours — so a domain left parked fails HTTPS and serves someone else's content. Check the A records rather than assuming they were set when hosting was attached.
 
 Point both the apex (`openassurance.nz`) and `www` at the host. The `.htaccess` redirects `www` to the apex, but the record has to resolve first for that redirect to run.
 
