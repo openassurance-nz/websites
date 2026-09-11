@@ -16,7 +16,8 @@ Options -Indexes
   RewriteRule ^\.well-known/ - [L]
 
   # Everything else, including www and any path, goes to the umbrella site.
-  RewriteRule ^ https://openassurance.nz/#profiles [L,R=302]
+  # NE (noescape) keeps the "#" a fragment instead of a percent-encoded path.
+  RewriteRule ^ https://openassurance.nz/#profiles [L,NE,R=302]
 </IfModule>
 
 <IfModule mod_headers.c>

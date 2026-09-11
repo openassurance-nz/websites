@@ -21,8 +21,11 @@ ErrorDocument 404 /404.html
   # get sites of their own. R=302, never 301: a permanent redirect would be
   # cached by browsers and search engines long after those sites went live.
   # Delete this block when opencompetency.nz and openprequal.nz move to their own document roots.
+  # NE (noescape) is required. Without it mod_rewrite percent-encodes the
+  # substitution, turning the "#" into "%23" — a literal path segment that
+  # 404s, rather than a fragment.
   RewriteCond %{HTTP_HOST} ^(www\.)?(opencompetency|openprequal)\.nz$ [NC]
-  RewriteRule ^ https://openassurance.nz/#profiles [L,R=302]
+  RewriteRule ^ https://openassurance.nz/#profiles [L,NE,R=302]
   # --- end TEMPORARY -----------------------------------------------------
 
   # Canonical host: https, no www, and not any alias parked on this account.

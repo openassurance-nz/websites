@@ -135,8 +135,11 @@ def htaccess(domain, held_aliases=()):
   # get sites of their own. R=302, never 301: a permanent redirect would be
   # cached by browsers and search engines long after those sites went live.
   # Delete this block when %(list)s move to their own document roots.
+  # NE (noescape) is required. Without it mod_rewrite percent-encodes the
+  # substitution, turning the "#" into "%%23" — a literal path segment that
+  # 404s, rather than a fragment.
   RewriteCond %%{HTTP_HOST} ^(www\\.)?(%(names)s)\\.nz$ [NC]
-  RewriteRule ^ https://%(domain)s/#profiles [L,R=302]
+  RewriteRule ^ https://%(domain)s/#profiles [L,NE,R=302]
   # --- end TEMPORARY -----------------------------------------------------
 """ % {"names": names, "domain": domain, "list": " and ".join(held_aliases)}
 
@@ -220,7 +223,8 @@ Options -Indexes
   RewriteRule ^\\.well-known/ - [L]
 
   # Everything else, including www and any path, goes to the umbrella site.
-  RewriteRule ^ https://%(target)s/%(anchor)s [L,R=302]
+  # NE (noescape) keeps the "#" a fragment instead of a percent-encoded path.
+  RewriteRule ^ https://%(target)s/%(anchor)s [L,NE,R=302]
 </IfModule>
 
 <IfModule mod_headers.c>
