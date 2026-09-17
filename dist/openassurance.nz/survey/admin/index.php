@@ -46,6 +46,7 @@ oa_page_open('Survey results');
   <div class="wrap">
     <h1>Survey results</h1>
     <p class="hint">Signed in as <?= h($user) ?>. This page is not indexed and is never cached.</p>
+    <p><strong>Survey results</strong> · <a href="/survey/admin/messages.php">Messages</a></p>
 <?php
 $checks = oa_diagnose();
 $ready = !array_filter($checks, function ($c) { return !$c[1]; });

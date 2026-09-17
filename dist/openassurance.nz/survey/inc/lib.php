@@ -309,3 +309,126 @@ function oa_answer_label(string $id, $value): string
     }
     return implode('; ', $labels);
 }
+
+/* ------------------------------------------------------------------------
+ * Contact form. It shares the survey's database, configuration, protections,
+ * and admin area, and it is built on the same promises: no cookies, no
+ * addresses stored, and nothing sent to any third party.
+ * --------------------------------------------------------------------- */
+
+const OA_MESSAGE_MAX = 4000;
+const OA_MESSAGE_MIN = 10;
+const OA_MESSAGE_MAX_LINKS = 2;
+const OA_NOTIFY_FROM = 'no-reply@openassurance.nz';
+
+function oa_contact_topics(): array
+{
+    return [
+        'general' => 'OpenAssurance in general',
+        'competency' => 'OpenCompetency: assurance about people',
+        'prequal' => 'OpenPrequal: assurance about organisations',
+    ];
+}
+
+/** The same roles the survey uses, so that the two can be read together. */
+function oa_contact_roles(): array
+{
+    return survey_questions()['role']['options'] ?? [];
+}
+
+/** The form is open only when the database is reachable and its table exists. */
+function oa_contact_open(): bool
+{
+    $db = oa_db();
+    if ($db === null) {
+        return false;
+    }
+    try {
+        $db->query('SELECT 1 FROM contact_messages LIMIT 1');
+        return true;
+    } catch (Throwable $e) {
+        return false;
+    }
+}
+
+/** The sentence saying who holds a sender's details. Falls back to the survey's. */
+function oa_contact_notice(): string
+{
+    $c = oa_config();
+    $notice = trim((string) ($c['contact_notice'] ?? ''));
+    if ($notice !== '' && stripos($notice, 'REPLACE') === false) {
+        return $notice;
+    }
+    return (string) ($c['holder_notice'] ?? '');
+}
+
+function oa_retention_days(): int
+{
+    $days = (int) (oa_config()['message_retention_days'] ?? 365);
+    return $days > 0 ? $days : 365;
+}
+
+function oa_contact_throttled(PDO $db): bool
+{
+    $limit = (int) (oa_config()['max_messages_per_hour'] ?? 30);
+    $stmt = $db->prepare('SELECT COUNT(*) AS n FROM contact_messages WHERE created_at >= :since');
+    $stmt->execute([':since' => gmdate('Y-m-d H:i:s', time() - 3600)]);
+    return (int) $stmt->fetch()['n'] >= $limit;
+}
+
+/** Messages are deleted once they are older than the period the form promises. */
+function oa_purge_old_messages(PDO $db): void
+{
+    try {
+        $stmt = $db->prepare('DELETE FROM contact_messages WHERE created_at < :cutoff');
+        $stmt->execute([':cutoff' => gmdate('Y-m-d H:i:s', time() - oa_retention_days() * 86400)]);
+    } catch (Throwable $e) {
+        error_log('OpenAssurance contact: could not remove old messages');
+    }
+}
+
+/** A single-line value: a name, an organisation, or an address. Line breaks never survive. */
+function oa_clean_line($value, int $max): string
+{
+    return trim(preg_replace('/\s+/u', ' ', oa_clean_text($value, $max)) ?? '');
+}
+
+function oa_link_count(string $text): int
+{
+    return preg_match_all('~(https?://|www\.)~i', $text);
+}
+
+/**
+ * Tell the operator that something has arrived. The address comes from the
+ * server-side configuration file and appears nowhere else. The notification
+ * deliberately carries no part of the message and nothing about its sender,
+ * because email leaves this host unencrypted. Nothing a visitor typed is ever
+ * placed in a mail header. A failure here never fails the visitor's submission.
+ */
+function oa_notify(string $subject, string $body): bool
+{
+    $c = oa_config();
+    $to = trim((string) ($c['notify_email'] ?? ''));
+    if ($to === '' || stripos($to, 'REPLACE') !== false || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+    $from = trim((string) ($c['notify_from'] ?? OA_NOTIFY_FROM));
+    if (!filter_var($from, FILTER_VALIDATE_EMAIL)) {
+        $from = OA_NOTIFY_FROM;
+    }
+    $subject = preg_replace('/[\r\n]+/', ' ', $subject);
+    // Used by the end-to-end test, so that no mail server is needed to run it.
+    if (!empty($c['notify_log'])) {
+        return @file_put_contents((string) $c['notify_log'], "To: $to\nFrom: $from\nSubject: $subject\n\n$body\n", FILE_APPEND) !== false;
+    }
+    $headers = 'From: OpenAssurance <' . $from . ">\r\n"
+        . "Content-Type: text/plain; charset=utf-8\r\n"
+        . "Auto-Submitted: auto-generated\r\n"
+        . 'X-Auto-Response-Suppress: All';
+    try {
+        return @mail($to, $subject, $body, $headers);
+    } catch (Throwable $e) {
+        error_log('OpenAssurance contact: notification could not be sent');
+        return false;
+    }
+}

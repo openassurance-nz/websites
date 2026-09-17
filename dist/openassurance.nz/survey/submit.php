@@ -27,7 +27,7 @@ if ($db === null) {
 
 // A field people cannot see and only automated submissions fill in. Answer as
 // if it worked, so that whatever sent it learns nothing.
-if (trim((string) ($_POST['website'] ?? '')) !== '') {
+if (trim((string) ($_POST['oa_leave_empty'] ?? '')) !== '') {
     oa_page_open('Thank you');
     echo '<section><div class="wrap"><h1>Thank you</h1><p>Your answers have been received.</p></div></section>';
     oa_page_close();

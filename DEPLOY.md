@@ -1,6 +1,6 @@
 # Deploying
 
-The sites are plain static HTML, with one exception: openassurance.nz carries a self-hosted survey under `/survey/` that needs PHP and a database. Everything else needs no PHP, no database, and no build step on the server.
+The sites are plain static HTML, with one exception: openassurance.nz carries a self-hosted survey under `/survey/` and a contact form under `/contact/`, which need PHP and a database. Everything else needs no PHP, no database, and no build step on the server.
 
 Hosting is an entry-level cPanel shared-hosting account running Apache or LiteSpeed. Both read the `.htaccess` file included in each build.
 
@@ -140,6 +140,48 @@ https://openassurance.nz/survey/inc/lib.php   403 Forbidden
 ```
 
 Submit one test response, confirm it appears in the admin area, and delete it with its removal code.
+
+## The contact form
+
+openassurance.nz also carries a contact form at `/contact/`. The two profile sites link to it and pass a topic, and they carry no form of their own, so there is one place where messages arrive.
+
+It is built on the survey: the same database, the same configuration file, the same protections, and the same admin area. It sets no cookies, stores no IP address, runs no script, and sends nothing to any third party. Your own address appears nowhere on the site and nowhere in this repository.
+
+### Setting it up
+
+1. **Upload the new build.** Upload `dist/openassurance.nz/contact/` and the changed files under `dist/openassurance.nz/survey/`, over the top of what is there. Do not delete `survey/admin`, for the reason given above. The admin pages for messages live inside that folder, so they are already behind its password.
+2. **Add the table.** In phpMyAdmin, run `survey-setup/schema.sql` again. It only creates what is missing, so the survey's table and its responses are untouched. Until the table exists the form tells visitors it is not open yet.
+3. **Turn on the notification, if you want one.** On the server, edit `openassurance-private/survey-config.php` and add `'notify_email' => 'your address',`. The sample in `survey-setup/survey-config.sample.php` shows every setting. Never put the address in the repository.
+
+The database user needs the same three rights as before, `SELECT`, `INSERT`, and `DELETE`, on the new table as well.
+
+The form posts to `contact/submit.php`. Do not rename it to anything containing `send`: the host's bot filter challenges every URL with `send` in its name by returning a 409 and a small script that sets a cookie, the site's security policy blocks that script, and the visitor sees a blank page. If an earlier upload left a `contact/send.php` on the server, delete it.
+
+### What a sender is asked, and what is kept
+
+A message is the only thing required. The name, organisation, and email fields are optional, and they only appear once `collect_contact` is true and a notice says who holds them, which is `contact_notice` if you fill it in and otherwise the survey's `holder_notice`. Without that notice the form still takes anonymous messages.
+
+Messages are deleted automatically once they are older than `message_retention_days`, which defaults to 365, and the form tells senders the period in months, so change the two together. Every sender is shown a removal code, which deletes the message at `/survey/remove.php`.
+
+### The notification
+
+The notification says that a message has arrived, gives its number and its topic, and links to the admin area. It deliberately carries no part of the message and nothing about the sender, because email leaves the host unencrypted. Read and answer messages from `/survey/admin/messages.php`, which shows the sender's address as a link where one was left.
+
+Shared hosts often refuse or mark as spam any mail whose sender does not exist on the domain. If notices do not arrive, create a mailbox or forwarder such as `no-reply@openassurance.nz` in cPanel and set `notify_from` to it. A notice that fails to send never stops a message being saved.
+
+### Checking a deployment
+
+```text
+https://openassurance.nz/contact/                          the form, or "not open yet" until the table exists
+https://openassurance.nz/survey/admin/messages.php         a password prompt, then the messages
+https://openassurance.nz/survey/admin/messages-export.php  a password prompt, then a CSV file
+```
+
+Send one test message, confirm the notice arrives and the message appears in the admin area, and delete it with its removal code.
+
+### Testing a change
+
+`bash survey-setup/test-survey.sh` runs the survey and the contact form end to end against SQLite. Run it after `python build.py` and before uploading anything under `survey/` or `contact/`.
 
 ## Verifying a deployment
 

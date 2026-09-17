@@ -94,7 +94,7 @@ function oa_render_question(string $id, array $q, array $sticky = []): void
     }
 ?>
       <p class="elsewhere" aria-hidden="true">
-        <label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+        <label>Leave this field empty <input type="text" name="oa_leave_empty" tabindex="-1" autocomplete="off"></label>
       </p>
       <input type="hidden" name="t" value="<?= h($t) ?>">
       <input type="hidden" name="k" value="<?= h($k) ?>">

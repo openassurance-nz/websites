@@ -307,7 +307,7 @@ def holding_page(site, target, anchor, css, accent):
 
 
 def robots(domain, survey=False):
-    block = "Disallow: /survey/\n" if survey else ""
+    block = "Disallow: /survey/\nDisallow: /contact/\n" if survey else ""
     return """User-agent: *
 Allow: /
 %s
@@ -316,8 +316,15 @@ Sitemap: https://%s/sitemap.xml
 
 
 def build_survey(out, css, accent):
-    """Copy the survey into a site, inlining the shared stylesheet into its page shell."""
-    source = ROOT / "src" / "survey"
+    """Copy the survey and the contact form into a site, inlining the shared stylesheet into the page shell."""
+    built = []
+    for folder in ("survey", "contact"):
+        built.extend(build_php_folder(out, css, accent, folder))
+    return built
+
+
+def build_php_folder(out, css, accent, folder):
+    source = ROOT / "src" / folder
     built = []
     for path in sorted(source.rglob("*")):
         if not path.is_file():
@@ -327,7 +334,7 @@ def build_survey(out, css, accent):
             if PLACEHOLDER not in text:
                 raise SystemExit("ERROR: src/survey/inc/shell.php has no %s placeholder" % PLACEHOLDER)
             text = text.replace(PLACEHOLDER, css).replace(ACCENT_PLACEHOLDER, accent)
-        target = out / "survey" / path.relative_to(source)
+        target = out / folder / path.relative_to(source)
         write(target, text)
         built.append(target)
     return built

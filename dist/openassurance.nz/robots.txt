@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /survey/
+Disallow: /contact/
 
 Sitemap: https://openassurance.nz/sitemap.xml

@@ -26,6 +26,7 @@ Every built page is completely self-contained: no web fonts, no CDN scripts, no 
 shared/site.css        The design, shared by all three sites
 src/*.html             Page sources, with {{SITE_CSS}} and {{SITE_ACCENT}} placeholders
 src/survey/            The survey on openassurance.nz: PHP pages, the question set, and the admin area
+src/contact/           The contact form on openassurance.nz, built on the survey's code and admin area
 survey-setup/          The database table and a configuration template; neither is ever served
 build.py               Inlines the CSS, emits each site, checks for external requests
 dist/<domain>/         Built output: one complete document root per site
@@ -43,6 +44,12 @@ Each `dist/<domain>/` folder is a complete document root — `index.html`, `404.
 openassurance.nz has a short survey at `/survey/`, which is the one place any of the sites uses PHP or a database. It is self-hosted so that no third-party service sees a visitor, it sets no cookies, and it stores no IP addresses. Responses are anonymous unless a respondent chooses to leave contact details, and every respondent gets a code that deletes their own response. Results are read in a password-protected admin area.
 
 Database credentials live in a file on the server, outside the web root, and never in this repository. Setup is in [DEPLOY.md](DEPLOY.md).
+
+## The contact form
+
+openassurance.nz also has a contact form at `/contact/`, and the two profile sites link to it. It is built on the survey's code, database, and admin area, and keeps the same promises: no cookies, no IP addresses, no scripts, and no third party. A message is all it requires, and a sender's name, organisation, and email are optional. Messages are deleted automatically after twelve months, and sooner with the removal code every sender is shown.
+
+The project's own address appears nowhere on the sites or in this repository. A notification can be sent to an address held only in the server-side configuration file, and it carries no part of the message. `bash survey-setup/test-survey.sh` tests the survey and the form end to end.
 
 ## Building
 

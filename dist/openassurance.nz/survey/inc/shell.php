@@ -1,6 +1,6 @@
 <?php
 /**
- * Page shell for the survey. build.py inlines the shared stylesheet here, as it
+ * Page shell for the survey and the contact form. build.py inlines the shared stylesheet here, as it
  * does for the static pages, because the site's content security policy allows
  * inline styles only and forbids every external resource.
  */
@@ -311,7 +311,7 @@ function oa_page_open(string $title): void
   .survey .q small, .survey .hint { display: block; color: var(--ink-soft); font-size: .9rem; font-weight: 400; }
   .survey label.opt { display: block; padding: .18rem 0 .18rem 1.7rem; text-indent: -1.7rem; }
   .survey label.opt input { margin-right: .55rem; }
-  .survey textarea, .survey input[type=text] {
+  .survey textarea, .survey input[type=text], .survey input[type=email], .survey select {
     width: 100%; box-sizing: border-box; font: inherit; color: inherit;
     background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: .55rem .65rem;
   }
@@ -342,7 +342,8 @@ function oa_page_open(string $title): void
     <nav class="top-nav" aria-label="Sections">
       <a href="/">Home</a>
       <a href="/survey/">Survey</a>
-      <a href="/survey/remove.php">Remove a response</a>
+      <a href="/contact/">Contact</a>
+      <a href="/survey/remove.php">Remove a response or message</a>
     </nav>
   </div>
 </header>
@@ -359,8 +360,8 @@ function oa_page_close(): void
 <footer>
   <div class="wrap">
     <p class="fineprint">
-      This survey sets no cookies, uses no analytics or third-party scripts, and does not store your
-      IP address with your response. To discuss the project in the open, raise an issue at
+      These pages set no cookies, use no analytics or third-party scripts, and do not store your
+      IP address with what you send. To discuss the project in the open, raise an issue at
       <a href="https://github.com/openassurance-nz/openassurance/issues">github.com/openassurance-nz</a>.
     </p>
   </div>
