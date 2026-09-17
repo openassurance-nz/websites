@@ -25,6 +25,8 @@ Every built page is completely self-contained: no web fonts, no CDN scripts, no 
 ```text
 shared/site.css        The design, shared by all three sites
 src/*.html             Page sources, with {{SITE_CSS}} and {{SITE_ACCENT}} placeholders
+src/survey/            The survey on openassurance.nz: PHP pages, the question set, and the admin area
+survey-setup/          The database table and a configuration template; neither is ever served
 build.py               Inlines the CSS, emits each site, checks for external requests
 dist/<domain>/         Built output: one complete document root per site
 DEPLOY.md              How to deploy to the current host
@@ -35,6 +37,12 @@ Per-site accent colours are defined once in `build.py` and applied to both the p
 Each `dist/<domain>/` folder is a complete document root — `index.html`, `404.html`, `.htaccess`, `robots.txt`, `sitemap.xml` — ready to upload as-is.
 
 `dist/` is committed. Any static host can serve it directly, and nobody needs to run a build to publish a change.
+
+## The survey
+
+openassurance.nz has a short survey at `/survey/`, which is the one place any of the sites uses PHP or a database. It is self-hosted so that no third-party service sees a visitor, it sets no cookies, and it stores no IP addresses. Responses are anonymous unless a respondent chooses to leave contact details, and every respondent gets a code that deletes their own response. Results are read in a password-protected admin area.
+
+Database credentials live in a file on the server, outside the web root, and never in this repository. Setup is in [DEPLOY.md](DEPLOY.md).
 
 ## Building
 

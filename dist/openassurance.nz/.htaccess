@@ -1,6 +1,6 @@
-# openassurance.nz — static site, no PHP required.
+# openassurance.nz — static pages, plus a self-hosted survey under /survey/ that needs PHP.
 
-DirectoryIndex index.html
+DirectoryIndex index.html index.php
 Options -Indexes
 ErrorDocument 404 /404.html
 
@@ -34,7 +34,7 @@ ErrorDocument 404 /404.html
   # The pages are entirely self-contained, so everything external can be
   # forbidden outright. This enforces at the server what build.py checks at
   # build time: scripts are banned, styles and images may only be inline.
-  Header always set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+  Header always set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
 
   # Cache policy lives here rather than in mod_expires, which cannot be made
   # conditional. mod_expires writes to a different header table, so a
@@ -44,6 +44,11 @@ ErrorDocument 404 /404.html
   # what a temporary redirect has to be.
   <FilesMatch "\.(html|txt|xml)$">
     Header set Cache-Control "max-age=600"
+  </FilesMatch>
+
+  # Survey pages are generated per request and must never be cached.
+  <FilesMatch "\.php$">
+    Header set Cache-Control "no-store"
   </FilesMatch>
 
   # Enable only once HTTPS is confirmed working on this domain. Browsers

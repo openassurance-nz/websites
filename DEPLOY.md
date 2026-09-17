@@ -1,6 +1,6 @@
 # Deploying
 
-The sites are plain static HTML. No PHP, no database, no build step on the server.
+The sites are plain static HTML, with one exception: openassurance.nz carries a self-hosted survey under `/survey/` that needs PHP and a database. Everything else needs no PHP, no database, and no build step on the server.
 
 Hosting is an entry-level cPanel shared-hosting account running Apache or LiteSpeed. Both read the `.htaccess` file included in each build.
 
@@ -89,6 +89,57 @@ Each domain needs A records pointing at the hosting account's IP address, shown 
 A newly registered domain often points at the registrar's parking service instead. Parking pages commonly carry advertising and tracking, and present a certificate for the registrar's own domain rather than yours — so a domain left parked fails HTTPS and serves someone else's content. Check the A records rather than assuming they were set when hosting was attached.
 
 Point both the apex (`openassurance.nz`) and `www` at the host. The `.htaccess` redirects `www` to the apex, but the record has to resolve first for that redirect to run.
+
+## The survey
+
+openassurance.nz carries a short survey at `/survey/`. It is the only part of any of the three sites that needs PHP and a database, and the two profile sites stay strictly static.
+
+It is self-hosted on purpose. A hosted survey service would be a third-party tracker on a site whose argument is that information should not be copied into more places than it needs to be. The survey sets no cookies, stores no IP addresses, and loads nothing from anywhere else.
+
+Requirements: PHP 7.4 or later with PDO and its MySQL driver, which every cPanel host provides, and one MySQL or MariaDB database.
+
+### One-off setup
+
+1. **Create the table.** In cPanel open *phpMyAdmin*, select the survey database, open the *SQL* tab, paste the contents of `survey-setup/schema.sql`, and run it.
+2. **Give the database user only what it needs.** In *MySQL Databases*, the user the survey connects as needs `SELECT`, `INSERT`, and `DELETE` on that database and nothing else. It never creates, alters, or drops anything.
+3. **Create the configuration file outside the web root.** In File Manager, in your home directory beside `public_html` and not inside it, create a folder named `openassurance-private`. Copy `survey-setup/survey-config.sample.php` into it as `survey-config.php` and fill in the database name, user, and password there, on the server.
+4. **Password-protect the admin area.** In cPanel open *Directory Privacy*, browse to `public_html/survey/admin`, tick *Password protect this directory*, and create a user. cPanel keeps the password file in `.htpasswds` in your home directory, outside the web root, and writes a small `.htaccess` into the admin folder.
+
+The real configuration file holds database credentials. It must never be committed: this repository is public. `.gitignore` excludes it by name as a last line of defence.
+
+The survey looks for its configuration one level above the document root, at `openassurance-private/survey-config.php`. If openassurance.nz is ever given a document root that is not directly under the home directory, move the folder so that it still sits beside that root.
+
+### The admin area
+
+`/survey/admin/` shows totals for every question, each response, and a CSV download, and lets a response be deleted.
+
+It is protected by the web server and not by code in this repository. The page checks that the server has authenticated someone and refuses to show anything if it has not, so forgetting step 4 produces a refusal and not an exposure. It deliberately ignores a user name that merely arrives in a request header, because anyone can send one.
+
+When uploading a new build, upload over the top of `survey/admin` and do not delete the folder, or the `.htaccess` cPanel put there is lost and the area refuses everyone until Directory Privacy is set again.
+
+### The optional contact field
+
+The contact field is off until you turn it on. Contact details are personal information, and the Privacy Act 2020 expects whoever collects it to say who is collecting and holding it. The field therefore appears only when `collect_contact` is true and `holder_notice` in the configuration file has been written. With it off, the survey is fully anonymous and none of that arises.
+
+Every respondent is shown a removal code on submitting. Anyone holding the code can delete that response, contact details included, at `/survey/remove.php`, so access to deletion never depends on anyone being reachable by email.
+
+### Changing the questions
+
+The questions live in `src/survey/inc/questions.php`, which drives the form, the validation, and the admin labels. Never name a product, a company, a scheme, or a person in a question. Change `SURVEY_VERSION` whenever a question's meaning changes, so that answers to different questions are never added together.
+
+### Publishing results
+
+Publish totals only. Leave out any answer chosen by fewer than five organisations, which the admin page marks with an asterisk, and never publish a comment or a contact detail.
+
+### Checking a deployment
+
+```text
+https://openassurance.nz/survey/              the form, or "not open yet" if the configuration is missing
+https://openassurance.nz/survey/admin/        a password prompt
+https://openassurance.nz/survey/inc/lib.php   403 Forbidden
+```
+
+Submit one test response, confirm it appears in the admin area, and delete it with its removal code.
 
 ## Verifying a deployment
 

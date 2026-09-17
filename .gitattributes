@@ -6,6 +6,8 @@
 *.css  text eol=lf
 *.js   text eol=lf
 *.md   text eol=lf
+*.php  text eol=lf
+*.sql  text eol=lf
 
 # Binary assets must never be line-ending converted.
 *.png binary

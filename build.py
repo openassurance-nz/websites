@@ -28,6 +28,9 @@ SITES = {
         # The umbrella site uses the palette's own accent; the profiles override it.
         "accent": None,
         "holding_anchor": None,
+        # A self-hosted survey under /survey/. It is the one part of any site
+        # that needs PHP, and the one page allowed to submit a form.
+        "survey": True,
     },
     "opencompetency.html": {
         "domain": "opencompetency.nz",
@@ -116,7 +119,7 @@ def external_requests(page):
             yield "%s (rel=%s)" % (href.group(1), rel.group(1))
 
 
-def htaccess(domain, held_aliases=()):
+def htaccess(domain, held_aliases=(), survey=False):
     """Apache/LiteSpeed config for shared hosting.
 
     held_aliases are domains parked onto this one as cPanel Aliases while their
@@ -148,9 +151,9 @@ def htaccess(domain, held_aliases=()):
   # --- end TEMPORARY -----------------------------------------------------
 """ % {"names": names, "domain": domain, "list": " and ".join(held_aliases)}
 
-    return """# %(domain)s — static site, no PHP required.
+    return """# %(domain)s — %(kind)s
 
-DirectoryIndex index.html
+DirectoryIndex %(index)s
 Options -Indexes
 ErrorDocument 404 /404.html
 
@@ -184,7 +187,7 @@ ErrorDocument 404 /404.html
   # The pages are entirely self-contained, so everything external can be
   # forbidden outright. This enforces at the server what build.py checks at
   # build time: scripts are banned, styles and images may only be inline.
-  Header always set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+  Header always set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action %(form_action)s; frame-ancestors 'none'"
 
   # Cache policy lives here rather than in mod_expires, which cannot be made
   # conditional. mod_expires writes to a different header table, so a
@@ -195,7 +198,7 @@ ErrorDocument 404 /404.html
   <FilesMatch "\\.(html|txt|xml)$">
     Header set Cache-Control "max-age=600"
   </FilesMatch>
-
+%(php_block)s
   # Enable only once HTTPS is confirmed working on this domain. Browsers
   # remember it, so a premature one is hard to undo.
   # Header always set Strict-Transport-Security "max-age=31536000"
@@ -212,7 +215,23 @@ ErrorDocument 404 /404.html
   # that redirect responses are never given one.
   ExpiresByType image/svg+xml "access plus 1 week"
 </IfModule>
-""" % {"domain": domain, "alias_block": alias_block, "escaped": domain.replace(".", r"\.")}
+""" % {
+        "domain": domain,
+        "alias_block": alias_block,
+        "escaped": domain.replace(".", r"\."),
+        "kind": ("static pages, plus a self-hosted survey under /survey/ that needs PHP."
+                 if survey else "static site, no PHP required."),
+        "index": "index.html index.php" if survey else "index.html",
+        # The survey posts to its own origin and nowhere else. Every other
+        # site keeps forms forbidden outright.
+        "form_action": "'self'" if survey else "'none'",
+        "php_block": ("""
+  # Survey pages are generated per request and must never be cached.
+  <FilesMatch "\\.php$">
+    Header set Cache-Control "no-store"
+  </FilesMatch>
+""" if survey else ""),
+    }
 
 
 def holding_htaccess(site, target, anchor):
@@ -287,12 +306,31 @@ def holding_page(site, target, anchor, css, accent):
 """ % {"name": site["name"], "target": target, "anchor": anchor, "css": css, "accent": accent}
 
 
-def robots(domain):
+def robots(domain, survey=False):
+    block = "Disallow: /survey/\n" if survey else ""
     return """User-agent: *
 Allow: /
-
+%s
 Sitemap: https://%s/sitemap.xml
-""" % domain
+""" % (block, domain)
+
+
+def build_survey(out, css, accent):
+    """Copy the survey into a site, inlining the shared stylesheet into its page shell."""
+    source = ROOT / "src" / "survey"
+    built = []
+    for path in sorted(source.rglob("*")):
+        if not path.is_file():
+            continue
+        text = read(path)
+        if path.name == "shell.php":
+            if PLACEHOLDER not in text:
+                raise SystemExit("ERROR: src/survey/inc/shell.php has no %s placeholder" % PLACEHOLDER)
+            text = text.replace(PLACEHOLDER, css).replace(ACCENT_PLACEHOLDER, accent)
+        target = out / "survey" / path.relative_to(source)
+        write(target, text)
+        built.append(target)
+    return built
 
 
 def sitemap(domain):
@@ -340,6 +378,7 @@ def not_found(site, css, accent):
 def main():
     css = read(CSS).rstrip("\n")
     failed = False
+    survey_files = []
 
     for source_name, site in SITES.items():
         domain = site["domain"]
@@ -357,8 +396,11 @@ def main():
         write(out / "index.html", page)
         write(out / "404.html", not_found(site, css, accent))
         aliases = HELD_ALIASES if domain == HOLDING_TARGET else ()
-        write(out / ".htaccess", htaccess(domain, aliases))
-        write(out / "robots.txt", robots(domain))
+        survey = bool(site.get("survey"))
+        write(out / ".htaccess", htaccess(domain, aliases, survey))
+        write(out / "robots.txt", robots(domain, survey))
+        if survey:
+            survey_files.extend(build_survey(out, css, accent))
         write(out / "sitemap.xml", sitemap(domain))
 
         size = len(page.encode("utf-8")) // 1024
@@ -381,6 +423,8 @@ def main():
             checks.append(ROOT / "dist" / site["domain"] / filename)
         if site.get("holding_anchor") is not None and site["domain"] in HELD_ALIASES:
             checks.append(ROOT / "holding" / site["domain"] / "index.html")
+
+    checks.extend(p for p in survey_files if p.suffix == ".php")
 
     for path in checks:
         for problem in external_requests(read(path)):
